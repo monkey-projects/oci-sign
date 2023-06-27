@@ -1,1 +1,13 @@
-{:deps {buddy/buddy-sign {:mvn/version "3.5.346"}}}
+{:deps {buddy/buddy-sign {:mvn/version "3.5.346"}
+        com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}}
+
+ :aliases
+ {:test
+  {:extra-deps {lambdaisland/kaocha {:mvn/version "1.85.1342"}
+                ;; Use the OCI java SDK for comparision
+                com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.17.1"}}
+   :extra-paths ["dev-resources"]
+   :main-opts ["-m" "kaocha.runner"]}
+
+  :watch
+  {:main-opts ["-m" "kaocha.runner" "--watch"]}}}

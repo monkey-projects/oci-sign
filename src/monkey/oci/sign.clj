@@ -3,9 +3,10 @@
             [clojure.spec.alpha :as s]
             [buddy.sign.compact :as c])
   (:import [java.net URI URLEncoder]
+           java.time.format.DateTimeFormatter
            java.util.Base64
            java.nio.charset.StandardCharsets
-           com.oracle.bmc.http.signing.internal.SignatureSigner))
+           [java.security Signature]))
 
 (def private-key? (partial instance? java.security.PrivateKey))
 
@@ -29,11 +30,17 @@
 (defn- url-encode [s]
   (URLEncoder/encode s charset))
 
+(def time-format DateTimeFormatter/RFC_1123_DATE_TIME)
+
+(defn format-time [t]
+  (.format time-format t))
+
 (defn sign-headers
   "Builds signing headers from the request"
   [{:keys [url method] :as req}]
   (let [uri (URI/create url)]
-    {"date" (first (get-in req [:headers "date"]))
+    {"date" (-> (get-in req [:headers "date"])
+                (format-time))
      ;; TODO Add query string
      "(request-target)" (str (name method) " " (.getRawPath uri))
      ;; TODO Add port
@@ -41,12 +48,13 @@
 
 (defn- generate-signature [s pk]
   #_(c/sign s pk {:alg :ps256})
-  (let [signer (SignatureSigner.)
-        enc (Base64/getEncoder)]
-    (->> (.sign signer pk (.getBytes s charset) "SHA256withRSA")
+  (let [enc (Base64/getEncoder)]
+    (->> (doto (Signature/getInstance "SHA256withRSA")
+           (.initSign pk)
+           (.update (.getBytes s charset)))
+         (.sign)
          (.encode enc)
-         (String.))))
-        
+         (String.))))        
 
 (defn sign
   "Signs a request by calculating a signature based on the given config."

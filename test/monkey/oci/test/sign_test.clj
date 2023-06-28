@@ -4,6 +4,7 @@
             [clojure.test :refer :all]
             [monkey.oci.sign :as sut])
   (:import java.net.URI
+           [java.time ZoneId ZonedDateTime]
            java.util.Optional
            java.util.function.Supplier
            com.oracle.bmc.http.signing.SigningStrategy
@@ -35,7 +36,7 @@
      signer
      (URI/create url)
      (name method)
-     headers
+     (update headers "date" (comp vector sut/format-time))
      nil)))
 
 (deftest privkey
@@ -49,13 +50,14 @@
                                 :key-fingerprint "c"})))))
 
 (deftest sign
-  (let [conf {:private-key (load-privkey)
+  (let [date (ZonedDateTime/of 2023 6 28 13 41 0 0 (ZoneId/of "CET"))
+        conf {:private-key (load-privkey)
               :user-ocid "user-ocid"
               :tenancy-ocid "tenancy-ocid"
               :key-fingerprint "fingerprint"}
         req  {:url "http://localhost/test"
               :method :get
-              :headers {"date" ["Tue, 27 Jun 2023 14:59:40 GMT"]}}]
+              :headers {"date" date}}]
     
     (testing "generates signature"
       (is (string? (sut/sign conf (sut/sign-headers req)))))

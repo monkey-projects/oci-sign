@@ -1,6 +1,7 @@
 (ns monkey.oci.test.request-test
   "Request integration test"
-  (:require [clojure.test :refer :all]
+  (:require [cheshire.core :as json]
+            [clojure.test :refer :all]
             [clojure.tools.logging :as log]
             [clojure.spec.alpha :as s]
             [config.core :refer [env]]
@@ -39,9 +40,11 @@
 
 (deftest get-request
   (testing "can execute simple GET request"
-    (let [req {:url "https://objectstorage.eu-frankfurt-1.oraclecloud.com/n/"
+    (let [req {:url (format "https://objectstorage.%s.oraclecloud.com/n/" (:region env))
                :method :get}
           conf (env->config)
           resp @(execute-request conf req)]
       (is (some? resp))
-      (is (= 200 (:status resp))))))
+      (is (= 200 (:status resp)))
+      ;; Body must be a json string
+      (is (string? (json/parse-string (:body resp)))))))

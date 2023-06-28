@@ -9,6 +9,12 @@ that is small and has as few dependencies as possible, so I can use it
 in GraalVM projects.  More specifically, to use them in native images
 for OCI [functions](https://fnproject.io).
 
+## Design
+
+I have written the code according to the [specs provided by Oracle](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/signingrequests.htm#six).
+These were however incomplete, so I also had to reverse engineer their Java
+code somewhat.  But eventually that did the trick.
+
 ## How to use it?
 
 Include the library in your project:
@@ -24,9 +30,13 @@ Then require the namespace, and invoke the `sign` function.
 (def config ...)
 (def req {:url "https://some-oci-url"
           :method :get})
+;; Generate the signature headers
 (def headers (sign/sign config req))
+
 ;; Send the request, e.g. using http-kit
-(http/get (:url req) headers)
+(require '[org.httpkit.client :as http])
+(http/get (:url req) {:headers headers})
+;; ...
 ```
 
 The configuration should contain the `:tenancy-ocid`, `:user-ocid`, `:key-fingerprint`
@@ -35,6 +45,13 @@ get it by reading it from a file and then parse it using [the buddy library](htt
 
 The request must at least contain the `:url` and `:method` (as a keyword).  You can also
 add the date but it's best to let the signer generate and format it.
+
+## TODO
+
+Still todo:
+
+- Add functionality for handling requests with a body (like `PUT` or `POST`).
+- Add decend CI scripting (probably using [CircleCI](https://circleci.com)).
 
 ## License
 

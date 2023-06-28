@@ -1,9 +1,10 @@
-{:deps {buddy/buddy-sign {:mvn/version "3.5.346"}
-        com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}}
+{:deps {}
 
  :aliases
  {:test
   {:extra-deps {lambdaisland/kaocha {:mvn/version "1.85.1342"}
+                buddy/buddy-sign {:mvn/version "3.5.346"}
+                com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}
                 org.slf4j/slf4j-api {:mvn/version "2.0.7"}
                 ch.qos.logback/logback-classic {:mvn/version "1.4.8"}
                 ;; Use the OCI java SDK for comparision

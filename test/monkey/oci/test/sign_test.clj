@@ -49,6 +49,13 @@
                                 :user-ocid "b"
                                 :key-fingerprint "c"})))))
 
+(deftest sign-headers
+  (testing "adds date if not provided"
+    (is (string? (-> {:url "http://test"
+                      :method :get}
+                     (sut/sign-headers)
+                     (get "date"))))))
+
 (deftest sign
   (let [date (ZonedDateTime/of 2023 6 28 13 41 0 0 (ZoneId/of "CET"))
         conf {:private-key (load-privkey)
@@ -57,14 +64,22 @@
               :key-fingerprint "fingerprint"}
         req  {:url "http://localhost/test"
               :method :get
-              :headers {"date" date}}]
+              :headers {"date" date}}
+        verify-signature (fn [req]
+                           (let [r (sign-java conf req)
+                                 auth (get r "authorization")]
+                             (is (not-empty r))
+                             (is (string? auth))
+                             (is (= auth (sut/sign conf (sut/sign-headers req))))))]
     
     (testing "generates signature"
       (is (string? (sut/sign conf (sut/sign-headers req)))))
 
     (testing "signature matches reference"
-      (let [r (sign-java conf req)
-            auth (get r "authorization")]
-        (is (not-empty r))
-        (is (string? auth))
-        (is (= auth (sut/sign conf (sut/sign-headers req))))))))
+      (verify-signature req))
+
+    (testing "adds uri port"
+      (verify-signature (assoc req :url "http://localhost:8080/test")))
+
+    (testing "adds query string"
+      (verify-signature (assoc req :url "http://localhost/test?key=value")))))

@@ -10,7 +10,8 @@
                 ;; Use the OCI java SDK for comparision
                 com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.17.1"}
                 ;; For running test requests
-                http-kit/http-kit {:mvn/version "2.6.0"}}
+                http-kit/http-kit {:mvn/version "2.6.0"}
+                yogthos/config {:mvn/version "1.2.0"}}
    :extra-paths ["dev-resources"]
    :main-opts ["-m" "kaocha.runner"]}
 

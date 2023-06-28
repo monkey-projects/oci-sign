@@ -77,7 +77,8 @@
          (String.))))        
 
 (defn sign
-  "Signs a request by calculating a signature based on the given config."
+  "Signs a request by calculating a signature based on the given config.
+   Returns the value of the `authorization` header, to include in your request."
   [conf headers]
   (let [h (->> (keys headers)
                (cs/join " "))

@@ -1,8 +1,8 @@
 (ns monkey.oci.test.sign-test
-  (:require [buddy.core.keys.pem :as pem]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.test :refer :all]
-            [monkey.oci.sign :as sut])
+            [monkey.oci.sign :as sut]
+            [monkey.oci.test.helpers :as th])
   (:import java.net.URI
            [java.time ZoneId ZonedDateTime]
            java.util.Optional
@@ -11,9 +11,7 @@
            [com.oracle.bmc.http.signing.internal KeySupplier RequestSignerImpl]))
 
 (defn load-privkey []
-  (with-open [r (-> (io/resource "test/test.key")
-                    (io/reader))]
-    (pem/read-privkey r nil)))
+  (th/load-privkey (io/resource "test/test.key")))
 
 (defn- as-key-supplier [f]
   (reify KeySupplier

@@ -1,0 +1,15 @@
+<configuration scan="true" scanPeriod="10 seconds">
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date %-5level [%logger] %msg%n</pattern>
+      <outputPatternAsHeader>true</outputPatternAsHeader>
+    </encoder>
+  </appender>
+  
+  <logger name="monkey.oci.sign" level="DEBUG"/>
+  <logger name="com.oracle" level="TRACE"/>
+  
+  <root level="WARN">
+    <appender-ref ref="CONSOLE" />
+  </root>
+</configuration>

@@ -13,30 +13,6 @@
 (defn load-privkey []
   (th/load-privkey (io/resource "test/test.key")))
 
-(defn- as-key-supplier [f]
-  (reify KeySupplier
-    (supplyKey [_ _]
-      (Optional/of (f)))))
-
-(defn- as-supplier [f]
-  (reify Supplier
-    (get [_]
-      (f))))
-
-(defn sign-java
-  "Generates a signature using the Oracle Java library.  This is used
-   as a reference to compare our own signatures against."
-  [conf {:keys [url method headers]}]
-  (let [signer (RequestSignerImpl. (as-key-supplier (constantly (:private-key conf)))
-                                   SigningStrategy/EXCLUDE_BODY
-                                   (as-supplier (constantly (sut/key-id conf))))]
-    (.signRequest
-     signer
-     (URI/create url)
-     (name method)
-     (update headers "date" (comp vector sut/format-time))
-     nil)))
-
 (deftest privkey
   (testing "can load"
     (is (some? (load-privkey)))))
@@ -64,12 +40,12 @@
               :method :get
               :headers {"date" date}}
         verify-signature (fn [req]
-                           (let [r (sign-java conf req)
+                           (let [r (th/sign-java conf req)
                                  auth (get r "authorization")]
                              (is (not-empty r))
                              (is (string? auth))
                              (is (= auth (sut/sign conf (sut/sign-headers req))))))]
-    
+
     (testing "generates signature"
       (is (string? (sut/sign conf (sut/sign-headers req)))))
 

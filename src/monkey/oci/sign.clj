@@ -3,7 +3,7 @@
             [clojure.spec.alpha :as s])
   (:import [java.net URI URLEncoder]
            java.time.format.DateTimeFormatter
-           java.time.ZonedDateTime
+           [java.time ZonedDateTime ZoneId]
            java.util.Base64
            [java.nio.charset Charset StandardCharsets]
            [java.security Signature]
@@ -60,7 +60,8 @@
   (let [uri (URI/create url)]
     ;; TODO Add request body, depending on the method
     {"date" (-> (or (get-in req [:headers "date"])
-                    (ZonedDateTime/now))
+                    ;; Timezone must be GMT!
+                    (ZonedDateTime/now (ZoneId/of "GMT")))
                 (format-time))
      "(request-target)" (str (name method) " " (format-path uri))
      "host" (format-host uri)}))

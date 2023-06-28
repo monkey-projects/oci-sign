@@ -79,7 +79,7 @@
 
 (defn sign
   "Signs a request by calculating a signature based on the given config.
-   Returns the value of the `authorization` header, to include in your request."
+   Returns the headers you should include in your request."
   [conf headers]
   (let [h (->> (keys headers)
                (cs/join " "))
@@ -99,4 +99,5 @@
                       (conj r (str k "=\"" v "\"")))
                     [])
          (cs/join ",")
-         (str "Signature "))))
+         (str "Signature ")
+         (hash-map "date" (get headers "date") "authorization"))))

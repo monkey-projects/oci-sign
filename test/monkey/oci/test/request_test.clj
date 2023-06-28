@@ -27,9 +27,7 @@
 
 (defn execute-request [conf req]
   (let [sign-headers (sign/sign-headers req)
-        signature (sign/sign conf sign-headers)
-        headers {"Authorization" signature
-                 "date" (get sign-headers "date")}]
+        headers (sign/sign conf sign-headers)]
     (log/debug "Sending request using headers" headers)
     (http/get (:url req)
               {:headers headers})))

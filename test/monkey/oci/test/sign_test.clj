@@ -44,10 +44,11 @@
                                  auth (get r "authorization")]
                              (is (not-empty r))
                              (is (string? auth))
-                             (is (= auth (sut/sign conf (sut/sign-headers req))))))]
+                             (is (= auth (-> (sut/sign conf (sut/sign-headers req))
+                                             (get "authorization"))))))]
 
-    (testing "generates signature"
-      (is (string? (sut/sign conf (sut/sign-headers req)))))
+    (testing "generates signature headers"
+      (is (map? (sut/sign conf (sut/sign-headers req)))))
 
     (testing "signature matches reference"
       (verify-signature req))

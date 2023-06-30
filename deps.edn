@@ -2,7 +2,8 @@
 
  :aliases
  {:test
-  {:extra-deps {lambdaisland/kaocha {:mvn/version "1.85.1342"}
+  {:extra-deps {;;monkey/build {:mvn/version "0.1.0-SNAPSHOT"}
+                com.monkeyprojects/build {:local/root "../build"}
                 buddy/buddy-sign {:mvn/version "3.5.346"}
                 com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}
                 org.slf4j/slf4j-api {:mvn/version "2.0.7"}
@@ -14,7 +15,21 @@
                 http-kit/http-kit {:mvn/version "2.6.0"}
                 yogthos/config {:mvn/version "1.2.0"}}
    :extra-paths ["dev-resources"]
-   :main-opts ["-m" "kaocha.runner"]}
+   :exec-fn monkey.test/all}
 
   :watch
-  {:main-opts ["-m" "kaocha.runner" "--watch"]}}}
+  {:exec-fn monkey.test/watch}
+  
+  :junit
+  {:exec-fn monkey.test/junit}
+
+  :jar
+  {:extra-deps {com.monkeyprojects/build {:mvn/version "0.1.0-SNAPSHOT"} #_{:local/root "../build"}}
+   :exec-fn monkey.build/jar
+   :exec-args {:jar "target/oci-sign.jar"
+               :lib "com.monkeyprojects/oci-sign"
+               :version "0.1.0-SNAPSHOT"
+               :scm {:url "https://github.com/monkey-projects/oci-sign"}}}
+
+  :deploy
+  {:exec-fn monkey.build/deploy}}}

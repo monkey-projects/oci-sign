@@ -17,6 +17,9 @@ code somewhat.  But eventually that did the trick.
 
 ## How to use it?
 
+[![Clojars Project](https://img.shields.io/clojars/v/com.monkeyprojects/oci-sign.svg)](https://clojars.org/com.monkeyprojects/oci-sign)
+[![CircleCI](https://circleci.com/gh/monkey-projects/oci-sign.svg?style=svg)](https://app.circleci.com/pipelines/github/monkey-projects/oci-sign)
+
 Include the library in your project:
 ```clojure
 {:deps {monkey/oci-sign {:mvn/version ..latest..}}}
@@ -36,7 +39,7 @@ Then require the namespace, and invoke the `sign` function.
 ;; Send the request, e.g. using http-kit
 (require '[org.httpkit.client :as http])
 (http/get (:url req) {:headers headers})
-;; ...
+;; Process the result...
 ```
 
 The configuration should contain the `:tenancy-ocid`, `:user-ocid`, `:key-fingerprint`
@@ -51,9 +54,3 @@ add the date but it's best to let the signer generate and format it.
 Still todo:
 
 - Add functionality for handling requests with a body (like `PUT` or `POST`).
-- Add decend CI scripting (probably using [CircleCI](https://circleci.com)).
-
-## License
-
-MIT license
-by Monkey Projects 2023

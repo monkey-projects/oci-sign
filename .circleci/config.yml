@@ -1,0 +1,64 @@
+version: 2.1
+
+executors:
+  clj:
+    docker:
+      - image: cimg/clojure:1.11.1-openjdk-17.0
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+        
+jobs:
+  test:
+    executor: clj
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "deps.edn" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Dependencies
+          command: clojure -X:deps prep
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "deps.edn" }}
+      - run:
+          name: Run unit tests
+          command: clojure -X:test:junit
+      - store_test_results:
+        path: junit.xml
+
+  deploy:
+    executor: clj
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "deps.edn" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Dependencies
+          command: clojure -X:deps prep
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "deps.edn" }}
+      - run:
+          name: Build Jar
+          command: clojure -X:jar
+      - run:
+          name: Deploy to Clojars
+          command: clojure -X:jar:deploy
+          
+workflows:
+  version: 2
+  full-build:
+    jobs:
+      - deploy:
+          context: clojars

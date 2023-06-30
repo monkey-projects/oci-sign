@@ -30,7 +30,7 @@ jobs:
           name: Run unit tests
           command: clojure -X:test:junit
       - store_test_results:
-        path: junit.xml
+          path: junit.xml
 
   deploy:
     executor: clj

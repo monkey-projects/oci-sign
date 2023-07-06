@@ -5,18 +5,27 @@
   (:import java.io.StringReader
            java.net.URI
            [java.time ZonedDateTime ZoneId]
-           java.util.Optional
+           [java.util Optional Base64]
            java.util.function.Supplier
            com.oracle.bmc.http.signing.SigningStrategy
            [com.oracle.bmc.http.signing.internal KeySupplier RequestSignerImpl]))
 
+(defn base64-decode
+  "Decodes given base64 string back into a string"
+  [s]
+  (-> (Base64/getDecoder)
+      (.decode s)
+      (String.)))
+
 (defn- ->reader
   "If `s` points to an existing file, open it as a file reader,
-   otherwise returns a string reader."
+   otherwise returns a string reader, assuming the contents is
+   base64 encoded."
   [s]
   (if (.exists (io/file s))
     (io/reader s)
-    (StringReader. s)))
+    ;; Read it, decode it, and put it back in a reader
+    (StringReader. (base64-decode s))))
 
 (defn load-privkey [src]
   (with-open [r (->reader src)]

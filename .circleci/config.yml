@@ -28,7 +28,7 @@ jobs:
           key: v1-dependencies-{{ checksum "deps.edn" }}
       - run:
           name: Debugging
-          command: echo "Private key: $PRIVATE_KEY"
+          command: 'echo "Private key: $PRIVATE_KEY"'
       - run:
           name: Run unit tests
           command: clojure -X:test:junit

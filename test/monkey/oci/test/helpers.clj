@@ -2,15 +2,24 @@
   (:require [buddy.core.keys.pem :as pem]
             [clojure.java.io :as io]
             [monkey.oci.sign :as sign])
-  (:import java.net.URI
+  (:import java.io.StringReader
+           java.net.URI
            [java.time ZonedDateTime ZoneId]
            java.util.Optional
            java.util.function.Supplier
            com.oracle.bmc.http.signing.SigningStrategy
            [com.oracle.bmc.http.signing.internal KeySupplier RequestSignerImpl]))
 
+(defn- ->reader
+  "If `s` points to an existing file, open it as a file reader,
+   otherwise returns a string reader."
+  [s]
+  (if (.exists (io/file s))
+    (io/reader s)
+    (StringReader. s)))
+
 (defn load-privkey [src]
-  (with-open [r (io/reader src)]
+  (with-open [r (->reader src)]
     (pem/read-privkey r nil)))
 
 (defn- as-key-supplier [f]

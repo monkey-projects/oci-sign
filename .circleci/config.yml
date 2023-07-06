@@ -21,7 +21,7 @@ jobs:
             - v1-dependencies-
       - run:
           name: Dependencies
-          command: clojure -X:deps prep
+          command: clojure -X:deps:test:jar prep
       - save_cache:
           paths:
             - ~/.m2
@@ -44,7 +44,7 @@ jobs:
             - v1-dependencies-
       - run:
           name: Dependencies
-          command: clojure -X:deps prep
+          command: clojure -X:deps:test:jar prep
       - save_cache:
           paths:
             - ~/.m2

@@ -63,3 +63,5 @@ workflows:
       - test
       - deploy:
           context: clojars
+          requires:
+            - test

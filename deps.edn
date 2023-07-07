@@ -1,4 +1,4 @@
-{:deps {}
+{:deps {org.clojure/tools.logging {:mvn/version "1.2.4"}}
 
  :aliases
  {:test
@@ -7,7 +7,6 @@
                 com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}
                 org.slf4j/slf4j-api {:mvn/version "2.0.7"}
                 ch.qos.logback/logback-classic {:mvn/version "1.4.8"}
-                org.clojure/tools.logging {:mvn/version "1.2.4"}
                 ;; Use the OCI java SDK for comparision
                 com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.17.1"}
                 ;; For running test requests
@@ -29,6 +28,9 @@
                :lib "com.monkeyprojects/oci-sign"
                :version "0.1.0-SNAPSHOT"
                :scm {:url "https://github.com/monkey-projects/oci-sign"}}}
+
+  :install
+  {:exec-fn monkey.build/jar+install}
 
   :deploy
   {:exec-fn monkey.build/deploy}}}

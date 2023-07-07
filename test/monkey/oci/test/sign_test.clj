@@ -91,4 +91,14 @@
     (testing "signature matches for POST request and non-empty body"
       (verify-signature (assoc req
                                :method :post
+                               :body "Test body")))
+
+    (testing "signature matches for PUT request"
+      (verify-signature (assoc req
+                               :method :put
+                               :body "Test body")))
+
+    (testing "signature matches for PATCH request"
+      (verify-signature (assoc req
+                               :method :patch
                                :body "Test body")))))

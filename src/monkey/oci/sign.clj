@@ -133,4 +133,4 @@
                     [])
          (cs/join ",")
          (str "Signature ")
-         (hash-map "date" (get headers "date") "authorization"))))
+         (assoc (select-keys headers ["date" "content-type" "content-length"]) "authorization"))))

@@ -36,7 +36,7 @@
   (testing "config is valid"
     (is (s/valid? ::sign/config (env->config)))))
 
-(deftest get-request
+(deftest ^:integration get-request
   (testing "can execute simple GET request"
     (let [req {:url (format "https://objectstorage.%s.oraclecloud.com/n/" (:region env))
                :method :get}

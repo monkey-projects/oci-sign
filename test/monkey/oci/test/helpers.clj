@@ -44,13 +44,19 @@
 (defn sign-java
   "Generates a signature using the Oracle Java library.  This is used
    as a reference to compare our own signatures against."
-  [conf {:keys [url method headers]}]
+  [conf {:keys [url method headers body]}]
   (let [signer (RequestSignerImpl. (as-key-supplier (constantly (:private-key conf)))
-                                   SigningStrategy/EXCLUDE_BODY
-                                   (as-supplier (constantly (sign/key-id conf))))]
+                                   SigningStrategy/STANDARD
+                                   (as-supplier (constantly (sign/key-id conf))))
+        ->vec (fn [v]
+                (cond-> v
+                  (not (vector? v)) vector))]
     (.signRequest
      signer
      (URI/create url)
      (name method)
-     (update headers "date" (comp vector sign/format-time #(or % (ZonedDateTime/now (ZoneId/of "GMT")))))
-     nil)))
+     (->> (update headers "date" (comp vector sign/format-time #(or % (ZonedDateTime/now (ZoneId/of "GMT")))))
+          (map (fn [[k v]]
+                 [k (->vec v)]))
+          (into {}))
+     body)))

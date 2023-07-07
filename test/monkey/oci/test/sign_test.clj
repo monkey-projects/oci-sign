@@ -28,7 +28,29 @@
     (is (string? (-> {:url "http://test"
                       :method :get}
                      (sut/sign-headers)
-                     (get "date"))))))
+                     (get "date")))))
+
+  (testing "adds content headers for POST"
+    (let [h (sut/sign-headers {:url "http://test"
+                               :method :post
+                               :body "test body"
+                               :headers {"content-type" "text/plain"
+                                         "content-length" "9"}})]
+      (is (contains? h "content-type"))
+      (is (contains? h "content-length"))
+      (is (contains? h "x-content-sha256"))))
+
+  (testing "defaults to `application/json`"
+    (is (= "application/json" (-> (sut/sign-headers {:url "http://test"
+                                                     :method :post
+                                                     :body "test"})
+                                  (get "content-type")))))
+
+  (testing "calculates `content-length` if not provided"
+    (is (= "4" (-> (sut/sign-headers {:url "http://test"
+                                      :method :post
+                                      :body "test"})
+                   (get "content-length"))))))
 
 (deftest sign
   (let [date (ZonedDateTime/of 2023 6 28 13 41 0 0 (ZoneId/of "CET"))
@@ -57,4 +79,16 @@
       (verify-signature (assoc req :url "http://localhost:8080/test")))
 
     (testing "adds query string"
-      (verify-signature (assoc req :url "http://localhost/test?key=value")))))
+      (verify-signature (assoc req :url "http://localhost/test?key=value")))
+
+    (testing "signature matches for POST request and empty body"
+      (verify-signature (-> req
+                            (assoc :method :post)
+                            (update :headers assoc
+                                    "content-type" "text/plain"
+                                    "content-length" "0"))))
+
+    (testing "signature matches for POST request and non-empty body"
+      (verify-signature (assoc req
+                               :method :post
+                               :body "Test body")))))

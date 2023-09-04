@@ -63,9 +63,10 @@
 (defn- calc-content-sha256 [{:keys [^String body]}]
   ;; TODO Handle input streams or other body forms
   (let [body (or body "")]
-    (-> (MessageDigest/getInstance "SHA-256")
-        (.digest (.getBytes body charset))
-        (base64-encode))))
+    (when (string? body)
+      (-> (MessageDigest/getInstance "SHA-256")
+          (.digest (.getBytes body charset))
+          (base64-encode)))))
 
 (defn- add-body-headers [h req]
   (let [ct-header "content-type"

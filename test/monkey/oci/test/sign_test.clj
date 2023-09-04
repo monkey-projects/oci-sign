@@ -91,7 +91,21 @@
     (testing "signature matches for POST request and non-empty body"
       (verify-signature (assoc req
                                :method :post
-                               :body "Test body")))
+                               :body "test body")))
+
+    (testing "signature matches for POST request with content type header"
+      (-> req
+          (assoc :method :post
+                 :body "{\"key\":\"value\"}")
+          (assoc-in [:headers "content-type"] "application/json")
+          (verify-signature)))
+
+    (testing "converts headers to lowercase"
+      (-> req
+          (assoc :method :post
+                 :body "{\"key\":\"value\"}")
+          (assoc-in [:headers "Content-Type"] "application/json")
+          (verify-signature)))    
 
     (testing "signature matches for PUT request"
       (verify-signature (assoc req

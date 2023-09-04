@@ -73,14 +73,10 @@
         cl-header "content-length"
         default-header (fn [k f]
                          (fn [in]
-                           (cond-> in
-                             (nil? (get in k)) (assoc k (f)))))
+                           (assoc in k (or (get-in req [:headers k]) (f)))))
         default-content-type (default-header ct-header (constantly "application/json"))
         default-content-length (default-header cl-header #(str (count (:body req))))]
     (-> h
-        (merge (-> req
-                   :headers
-                   (select-keys [cl-header ct-header])))
         ;; Default headers, in case they are missing
         (default-content-length)
         (default-content-type)

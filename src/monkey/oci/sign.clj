@@ -103,8 +103,8 @@
                     (format-time))
          "(request-target)" (str (name method) " " (format-path uri))
          "host" (format-host uri)}
-      (#{:post :put :patch} method)
-      (add-body-headers (assoc req :headers headers)))))
+        (#{:post :put :patch} method)
+        (add-body-headers (assoc req :headers headers)))))
 
 (defn- generate-signature
   "Generates the signature for the string using the given private key."
@@ -141,7 +141,8 @@
                     [])
          (cs/join ",")
          (str "Signature ")
-         (assoc (select-keys headers ["date" "content-type" "content-length"]) "authorization"))))
+         (assoc (select-keys headers ["date" "content-type" "content-length" "x-content-sha256"])
+                "authorization"))))
 
 (defn merge-headers
   "Merges original request headers with the signature headers.  This makes sure there

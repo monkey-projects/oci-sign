@@ -81,31 +81,42 @@
     (testing "adds query string"
       (verify-signature (assoc req :url "http://localhost/test?key=value")))
 
-    (testing "signature matches for POST request and empty body"
-      (verify-signature (-> req
-                            (assoc :method :post)
-                            (update :headers assoc
-                                    "content-type" "text/plain"
-                                    "content-length" "0"))))
+    (testing "POST request"
 
-    (testing "signature matches for POST request and non-empty body"
-      (verify-signature (assoc req
-                               :method :post
-                               :body "test body")))
+      (testing "signature matches for empty body"
+        (verify-signature (-> req
+                              (assoc :method :post)
+                              (update :headers assoc
+                                      "content-type" "text/plain"
+                                      "content-length" "0"))))
 
-    (testing "signature matches for POST request with content type header"
-      (-> req
-          (assoc :method :post
-                 :body "{\"key\":\"value\"}")
-          (assoc-in [:headers "content-type"] "application/json")
-          (verify-signature)))
+      (testing "signature matches for non-empty body"
+        (verify-signature (assoc req
+                                 :method :post
+                                 :body "test body")))
 
-    (testing "converts headers to lowercase"
-      (-> req
-          (assoc :method :post
-                 :body "some test")
-          (assoc-in [:headers "Content-Type"] "text/plain")
-          (verify-signature)))    
+      (testing "signature matches for request with content type header"
+        (-> req
+            (assoc :method :post
+                   :body "{\"key\":\"value\"}")
+            (assoc-in [:headers "content-type"] "application/json")
+            (verify-signature)))
+
+      (testing "converts headers to lowercase"
+        (-> req
+            (assoc :method :post
+                   :body "some test")
+            (assoc-in [:headers "Content-Type"] "text/plain")
+            (verify-signature)))
+
+      (testing "includes `x-content-sha256` header"
+        (is (string? (as-> req x
+                       (assoc x
+                              :method :post
+                              :body "some test")
+                       (sut/sign-headers x)
+                       (sut/sign conf x)
+                       (get x "x-content-sha256"))))))
 
     (testing "signature matches for PUT request"
       (verify-signature (assoc req

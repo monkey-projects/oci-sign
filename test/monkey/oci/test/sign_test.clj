@@ -103,8 +103,8 @@
     (testing "converts headers to lowercase"
       (-> req
           (assoc :method :post
-                 :body "{\"key\":\"value\"}")
-          (assoc-in [:headers "Content-Type"] "application/json")
+                 :body "some test")
+          (assoc-in [:headers "Content-Type"] "text/plain")
           (verify-signature)))    
 
     (testing "signature matches for PUT request"
@@ -116,3 +116,24 @@
       (verify-signature (assoc req
                                :method :patch
                                :body "Test body")))))
+
+(deftest merge-headers
+  (testing "merges request and signature headers"
+    (is (= {"date" "test-date"
+            "content-type" "test-type"}
+           (sut/merge-headers {"date" "test-date"}
+                              {"content-type" "test-type"}))))
+
+  (testing "signature headers have precedence"
+    (is (= {"date" "test-date"
+            "content-type" "signature-type"}
+           (sut/merge-headers {"date" "test-date"
+                               "content-type" "request-type"}
+                              {"content-type" "signature-type"}))))
+
+  (testing "keeps in mind casing differences"
+    (is (= {"date" "test-date"
+            "content-type" "signature-type"}
+           (sut/merge-headers {"date" "test-date"
+                               "Content-Type" "request-type"}
+                              {"content-type" "signature-type"})))))

@@ -19,30 +19,36 @@
               :user-ocid "test-user"
               :tenancy-ocid "test-tenancy"
               :key-fingerprint "test-fingerprint"}
-        s (sut/signer conf)]
+        s (sut/signer conf)
+        ts (java.time.ZonedDateTime/now)]
 
     (testing "adds authorization header to request"
       (is (some? (-> {:request {:url "http://localhost/test"
-                                :method :get}}
+                                :method :get
+                                :headers {"date" ts}}}
                      ((:enter s))
                      (get-in [:request :headers "authorization"])))))
 
     (testing "takes query params into account"
       (is (= (-> {:request {:url "http://localhost/test"
                             :method :get
-                            :query-params {:key "value"}}}
+                            :query-params {:key "value"}
+                            :headers {"date" ts}}}
                  ((:enter s))
                  (get-in [:request :headers]))
              (sign/sign conf (sign/sign-headers {:method :get
-                                                 :url "http://localhost/test?key=value"})))))
+                                                 :url "http://localhost/test?key=value"
+                                                 :headers {"date" ts}})))))
 
     (testing "excludes body if configured"
       (let [s (sut/signer (assoc conf :exclude-body? (constantly true)))]
         (is (= (-> {:request {:url "http://localhost/test"
                               :method :put
-                              :body "test body"}}
+                              :body "test body"
+                              :headers {"date" ts}}}
                    ((:enter s))
                    (get-in [:request :headers]))
                (sign/sign conf (sign/sign-headers {:method :put
-                                                   :url "http://localhost/test"}
+                                                   :url "http://localhost/test"
+                                                   :headers {"date" ts}}
                                                   true))))))))

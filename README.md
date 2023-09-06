@@ -73,7 +73,7 @@ as the basic signing functions, with an extra option (`exclude-body?`, more on t
 Normally, for `PUT`, `POST` and `PATCH` requests, the body will also be included in the
 signature calculation.  However, [some requests](https://docs.oracle.com/en-us/iaas/api/#/en/objectstorage/20160918/Object/PutObject)
 require special treatment.  To allow for this, the signer accepts an additional
-configuration property, `exclude-body?` which is a function that takes the request
+configuration property, `exclude-body?` which is a function that takes the request context
 as argument and returns `true` if the body should be explicitly excluded, even though
 it's a request with a body and one of the aforementioned HTTP methods.
 

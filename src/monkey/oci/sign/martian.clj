@@ -20,7 +20,7 @@
   [{:keys [exclude-body?] :as conf :or {exclude-body? (constantly false)}} {:keys [request handler] :as ctx}]
   (let [sign-headers (-> request
                          (assoc :url (url-with-query request))
-                         (sign/sign-headers (exclude-body? request)))
+                         (sign/sign-headers (exclude-body? ctx)))
         headers (sign/sign conf sign-headers)]
     (update-in ctx [:request :headers] sign/merge-headers headers)))
 

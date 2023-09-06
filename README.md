@@ -49,8 +49,34 @@ get it by reading it from a file and then parse it using [the buddy library](htt
 The request must at least contain the `:url` and `:method` (as a keyword).  You can also
 add the date but it's best to let the signer generate and format it.
 
-## TODO
+## Martian
 
-Still todo:
+If you're using [Martian](https://github.com/oliyh/martian), you can include an interceptor
+that is provided by this library to sign requests.  It takes the same configuration map
+as the basic signing functions, with an extra option (`exclude-body?`, more on that below):
 
-- Add functionality for handling requests with a body (like `PUT` or `POST`).
+```clojure
+(require '[monkey.oci.sign.martian :as mm])
+
+;; Create Martian context that includes the signer interceptor
+(def ctx (martian/bootstrap
+          "http://api-host"
+	  routes
+	  {:interceptors (concat martian/default-interceptors
+	                         [(mm/signer conf)
+				  martian-http/perform-request])}))
+;; Now send a request
+(martian/response-for ctx :my-request {:key "value"})
+;; The request will include authorization headers for OCI.
+```
+
+Normally, for `PUT`, `POST` and `PATCH` requests, the body will also be included in the
+signature calculation.  However, [some requests](https://docs.oracle.com/en-us/iaas/api/#/en/objectstorage/20160918/Object/PutObject)
+require special treatment.  To allow for this, the signer accepts an additional
+configuration property, `exclude-body?` which is a function that takes the request
+as argument and returns `true` if the body should be explicitly excluded, even though
+it's a request with a body and one of the aforementioned HTTP methods.
+
+## Copyright
+
+Copyright (c) 2023 by Monkey Projects BV.

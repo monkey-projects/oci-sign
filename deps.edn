@@ -12,7 +12,7 @@
                 ;; For running test requests
                 http-kit/http-kit {:mvn/version "2.6.0"}
                 yogthos/config {:mvn/version "1.2.0"}}
-   :extra-paths ["dev-resources"]
+   :extra-paths ["dev-resources" "test"]
    :exec-fn monkey.test/all}
 
   :watch
@@ -20,6 +20,10 @@
   
   :junit
   {:exec-fn monkey.test/junit}
+
+  :coverage
+  {:exec-fn monkey.test/coverage
+   :exec-args {:ns-regex ["monkey.oci.sign.*"]}}
 
   :jar
   {:extra-deps {com.monkeyprojects/build {:mvn/version "0.1.0-SNAPSHOT"}}

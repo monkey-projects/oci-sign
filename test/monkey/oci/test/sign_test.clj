@@ -50,7 +50,18 @@
     (is (= "4" (-> (sut/sign-headers {:url "http://test"
                                       :method :post
                                       :body "test"})
-                   (get "content-length"))))))
+                   (get "content-length")))))
+
+  (testing "excludes body when specified"
+    (let [h (sut/sign-headers {:url "http://test"
+                               :method :post
+                               :body "test body"
+                               :headers {"content-type" "text/plain"
+                                         "content-length" "9"}}
+                              true)]
+      (is (not (contains? h "content-type")))
+      (is (not (contains? h "content-length")))
+      (is (not (contains? h "x-content-sha256"))))))
 
 (deftest sign
   (let [date (ZonedDateTime/of 2023 6 28 13 41 0 0 (ZoneId/of "CET"))
@@ -126,7 +137,10 @@
     (testing "signature matches for PATCH request"
       (verify-signature (assoc req
                                :method :patch
-                               :body "Test body")))))
+                               :body "Test body")))
+
+    (testing "fails if invalid configuration"
+      (is (thrown? AssertionError (sut/sign {:tenancy-ocid 1234} {}))))))
 
 (deftest merge-headers
   (testing "merges request and signature headers"

@@ -32,9 +32,6 @@
        (map (partial get conf))
        (cs/join "/")))
 
-(defn- url-encode [^String s]
-  (URLEncoder/encode s charset))
-
 (def ^DateTimeFormatter time-format DateTimeFormatter/RFC_1123_DATE_TIME)
 
 (defn format-time [^ZonedDateTime t]
@@ -92,8 +89,10 @@
         (assoc "x-content-sha256" (calc-content-sha256 req)))))
 
 (defn sign-headers
-  "Builds signing headers from the request"
-  [{:keys [url method headers] :as req}]
+  "Builds signing headers from the request.  If `exclude-body?` is true,
+   then the request body will not be included in the signature, even if
+   the request contains one."
+  [{:keys [url method headers] :as req} & [exclude-body?]]
   (let [headers (->lower-case-keys headers)
         uri (URI/create url)]
     (cond->
@@ -103,8 +102,8 @@
                     (format-time))
          "(request-target)" (str (name method) " " (format-path uri))
          "host" (format-host uri)}
-        (#{:post :put :patch} method)
-        (add-body-headers (assoc req :headers headers)))))
+      (and (not (true? exclude-body?)) (#{:post :put :patch} method))
+      (add-body-headers (assoc req :headers headers)))))
 
 (defn- generate-signature
   "Generates the signature for the string using the given private key."
@@ -119,6 +118,7 @@
   "Signs a request by calculating a signature based on the given config.
    Returns the headers you should include in your request."
   [conf headers]
+  {:pre [(s/valid? ::config conf)]}
   (let [h (->> (keys headers)
                (cs/join " "))
         v (->> headers
@@ -133,8 +133,8 @@
            "signature" signature
            "version" "1"}]
     (log/debug "Generating signature based on headers" headers)
-    (log/debug "Header order:" h)
-    (log/debug "Signature:" signature)
+    (log/trace "Header order:" h)
+    (log/trace "Signature:" signature)
     (->> m
          (reduce-kv (fn [r k v]
                       (conj r (str k "=\"" v "\"")))
@@ -151,3 +151,7 @@
    function, which yields lowercase header names."
   [req-headers sign-headers]
   (merge (->lower-case-keys req-headers) sign-headers))
+
+#_(defn- url-encode [^String s]
+  (URLEncoder/encode s charset))
+

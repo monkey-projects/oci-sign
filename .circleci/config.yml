@@ -52,9 +52,19 @@ jobs:
       - run:
           name: Build Jar
           command: clojure -X:jar
-      - run:
-          name: Deploy to Clojars
-          command: clojure -X:jar:deploy
+      - when:
+          condition: <<pipeline.git.tag>>
+          steps:
+            - run:
+                name: Deploy release to Clojars
+                # Deploy the lib with the tag as version
+                command: clojure -X:jar:deploy :version '"<<pipeline.git.tag>>"'
+      - unless:
+          condition: <<pipeline.git.tag>>
+          steps:
+            - run:
+                name: Deploy to Clojars
+                command: clojure -X:jar:deploy
           
 workflows:
   version: 2
@@ -66,3 +76,10 @@ workflows:
           context: clojars
           requires:
             - test
+          filters:
+            branches:
+              # Only deploy from the main branch for snapshots
+              only: main
+            tags:
+              # Deploy for tags that have version format, for releases
+              only: /[0-9]+\.[0-9]+(\.[0-9]+)?/

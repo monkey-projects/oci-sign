@@ -72,6 +72,10 @@ workflows:
     jobs:
       - test:
           context: oci-test
+          filters:
+            tags:
+              # Added because deploy requires test
+              only: /.*/
       - deploy:
           context: clojars
           requires:

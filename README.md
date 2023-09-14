@@ -22,19 +22,35 @@ code somewhat.  But eventually that did the trick.
 
 Include the library in your project:
 ```clojure
-{:deps {monkey/oci-sign {:mvn/version ..latest..}}}
+{:deps {com.monkeyprojects/oci-sign {:mvn/version ..latest..}}}
 ```
 
-Then require the namespace, and invoke the `sign` function.
+Then require the namespace, and invoke the `sign-headers` and `sign` functions.
+The `sign-headers` takes a regular Ring request, and extracts the headers that
+should be included in the signature.  Which headers depends on the kind of request.
+It always includes the date, host and a generated value that combines the method
+and the path.  For `PUT` and `POST`, it also includes a body hash, but there
+are exceptions (see below).  You can also influence this by passing an additional
+boolean `exclude-body?`, to forcibly exclude the body from the signature, even
+if it is a `POST` or `PUT`.
+
+The `sign-headers` returns a map that can then be passed to `sign`, which will
+generate the actual signature using the configuration.  The configuration holds
+a private key, but also values that are used to build a `keyId` header value.
+These headers should then be included in your request to the OCI endpoint.
+
 ```clojure
 (require '[monkey.oci.sign :as sign])
 
 ;; Configuration should be according to spec
-(def config ...)
+(def config {:tenancy-ocid "..."
+             :user-ocid "..."
+	     :key-fingerprint "..."
+	     :private-key some-pk})
 (def req {:url "https://some-oci-url"
           :method :get})
 ;; Generate the signature headers
-(def headers (sign/sign config req))
+(def headers (sign/sign config (sign/sign-headers req)))
 
 ;; Send the request, e.g. using http-kit
 (require '[org.httpkit.client :as http])
@@ -70,6 +86,8 @@ as the basic signing functions, with an extra option (`exclude-body?`, more on t
 ;; The request will include authorization headers for OCI.
 ```
 
+### Excluding The Body
+
 Normally, for `PUT`, `POST` and `PATCH` requests, the body will also be included in the
 signature calculation.  However, [some requests](https://docs.oracle.com/en-us/iaas/api/#/en/objectstorage/20160918/Object/PutObject)
 require special treatment.  To allow for this, the signer accepts an additional
@@ -80,3 +98,4 @@ it's a request with a body and one of the aforementioned HTTP methods.
 ## Copyright
 
 Copyright (c) 2023 by Monkey Projects BV.
+Licensed under [MIT](LICENSE)

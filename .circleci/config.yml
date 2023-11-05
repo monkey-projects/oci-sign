@@ -7,7 +7,8 @@ executors:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-        
+    resource_class: small
+         
 jobs:
   test:
     executor: clj

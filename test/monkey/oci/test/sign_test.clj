@@ -92,6 +92,10 @@
     (testing "adds query string"
       (verify-signature (assoc req :url "http://localhost/test?key=value")))
 
+    (testing "url escapes query string"
+      (verify-signature (assoc req :url "http://localhost/test?key=a/b"))
+      (verify-signature (assoc req :url "http://localhost/test?key=a%2Fb")))
+
     (testing "POST request"
 
       (testing "signature matches for empty body"

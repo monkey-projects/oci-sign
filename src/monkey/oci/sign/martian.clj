@@ -1,7 +1,11 @@
 (ns monkey.oci.sign.martian
   "Provides a Martian interceptor to sign requests"
   (:require [clojure.string :as cs]
-            [monkey.oci.sign :as sign]))
+            [monkey.oci.sign :as sign])
+  (:import java.net.URLEncoder))
+
+(defn- url-encode [v]
+  (URLEncoder/encode v sign/charset))
 
 (defn- url-with-query
   "Builds the full url, including query params"
@@ -9,8 +13,7 @@
   (letfn [(->str [qp]
             (->> qp
                  (map (fn [[k v]]
-                        ;; TODO Url escaping
-                        (str (name k) "=" v)))
+                        (str (name k) "=" (url-encode v))))
                  (cs/join "&")))]
     (cond-> url
       (not-empty query-params) (str "?" (->str query-params)))))

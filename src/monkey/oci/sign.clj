@@ -152,6 +152,4 @@
   [req-headers sign-headers]
   (merge (->lower-case-keys req-headers) sign-headers))
 
-#_(defn- url-encode [^String s]
-  (URLEncoder/encode s charset))
 

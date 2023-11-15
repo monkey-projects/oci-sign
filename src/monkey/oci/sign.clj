@@ -151,5 +151,3 @@
    function, which yields lowercase header names."
   [req-headers sign-headers]
   (merge (->lower-case-keys req-headers) sign-headers))
-
-

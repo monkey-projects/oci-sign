@@ -5,7 +5,7 @@
   (:import java.net.URLEncoder))
 
 (defn- url-encode [v]
-  (URLEncoder/encode v sign/charset))
+  (URLEncoder/encode (str v) sign/charset))
 
 (defn- url-with-query
   "Builds the full url, including query params"

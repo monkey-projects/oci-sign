@@ -18,7 +18,6 @@ code somewhat.  But eventually that did the trick.
 ## How to use it?
 
 [![Clojars Project](https://img.shields.io/clojars/v/com.monkeyprojects/oci-sign.svg)](https://clojars.org/com.monkeyprojects/oci-sign)
-[![CircleCI](https://circleci.com/gh/monkey-projects/oci-sign.svg?style=svg)](https://app.circleci.com/pipelines/github/monkey-projects/oci-sign)
 
 Include the library in your project:
 ```clojure

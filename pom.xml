@@ -5,6 +5,7 @@
   <groupId>com.monkeyprojects</groupId>
   <artifactId>oci-sign</artifactId>
   <name>oci-sign</name>
+  <version>0.1.3-SNAPSHOT</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
   </build>

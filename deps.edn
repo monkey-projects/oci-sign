@@ -1,17 +1,17 @@
-{:deps {org.clojure/tools.logging {:mvn/version "1.2.4"}}
+{:deps {org.clojure/tools.logging {:mvn/version "1.3.0"}}
 
  :aliases
  {:test
   {:extra-deps {com.monkeyprojects/build {:mvn/version "0.2.0"}
-                buddy/buddy-sign {:mvn/version "3.5.346"}
-                com.taoensso/nippy {:mvn/version "3.3.0-alpha2"}
-                org.slf4j/slf4j-api {:mvn/version "2.0.7"}
-                ch.qos.logback/logback-classic {:mvn/version "1.4.8"}
+                buddy/buddy-sign {:mvn/version "3.6.1-359"}
+                com.taoensso/nippy {:mvn/version "3.5.0-RC1"}
+                org.slf4j/slf4j-api {:mvn/version "2.0.16"}
+                ch.qos.logback/logback-classic {:mvn/version "1.5.16"}
                 ;; Use the OCI java SDK for comparision
-                com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.17.1"}
+                com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.55.2"}
                 ;; For running test requests
-                http-kit/http-kit {:mvn/version "2.6.0"}
-                yogthos/config {:mvn/version "1.2.0"}}
+                http-kit/http-kit {:mvn/version "2.8.0"}
+                yogthos/config {:mvn/version "1.2.1"}}
    :extra-paths ["dev-resources" "test"]
    :exec-fn monkey.test/all}
 
@@ -40,5 +40,5 @@
   {:exec-fn monkey.build/jar+deploy}
 
   :clj-kondo
-  {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2023.09.07"}}
+  {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.01.16"}}
    :main-opts ["-m" "clj-kondo.main"]}}}

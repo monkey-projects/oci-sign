@@ -5,11 +5,11 @@
  {:test
   {:extra-deps {com.monkeyprojects/build {:mvn/version "0.3.1"}
                 buddy/buddy-sign {:mvn/version "3.6.1-359"}
-                com.taoensso/nippy {:mvn/version "3.5.0-RC1"}
+                com.taoensso/nippy {:mvn/version "3.6.0"}
                 org.slf4j/slf4j-api {:mvn/version "2.0.17"}
                 ch.qos.logback/logback-classic {:mvn/version "1.5.18"}
                 ;; Use the OCI java SDK for comparision
-                com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.61.0"}
+                com.oracle.oci.sdk/oci-java-sdk-common {:mvn/version "3.67.3"}
                 ;; For running test requests
                 http-kit/http-kit {:mvn/version "2.8.0"}
                 yogthos/config {:mvn/version "1.2.1"}}
@@ -53,5 +53,5 @@
 
   ;; clj -M:test:clj-kondo
   :clj-kondo
-  {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.02.20"}}
+  {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.06.05"}}
    :main-opts ["-m" "clj-kondo.main"]}}}

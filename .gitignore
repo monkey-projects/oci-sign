@@ -1,4 +1,4 @@
-/.cpcache
+.cpcache/
 /junit.xml
 .nrepl-port
 /target
